@@ -5,66 +5,68 @@ import ModalCard from "./ModalCard";
 
 export interface StandardComponentProps {
     userName: string // TODO delete it
-    board: { id: number; title: string; cards: { id: number; title: string; description?: string}[] }
+    board: { id: string; title: string;
+        cards: { id: string; author: string; title: string; description?: string;
+            comments?: { id: string; author: string; content: string }[];
+        }[]
+    }
     updateBoard: any
 }
 
 
 const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
 
-    const [isNewCard, setNewCard] = useState<{[key: number]: boolean}>();
+    const [isNewCard, setNewCard] = useState<{[key: string]: boolean}>();
     const [cardTitle, setCardTitle] = useState("");
     const [modalShow, setModalShow] = React.useState<boolean>(false);
-    const [card, setCard] = React.useState<{ id: number; title: string }>(
-        {} as { id: number; title: string }
+    const [card, setCard] = React.useState<{ id: string; author: string; title: string; description?: string;
+        comments?: { id: string; author: string; content: string }[]; }>(
+        {} as { id: string; author: string; title: string; description?: string;
+            comments?: { id: string; author: string; content: string }[]; }
     );
 
-    function toggleNewCard(id: number) {
-        setNewCard((state) => ({
-            ...state,
-            [id]: true,
+    function toggleNewCard(id: string, state: boolean) {
+        setNewCard((isNewCard) => ({
+            ...isNewCard,
+            [id]: state,
         }));
     }
 
     function addCard(
-        board: { id: number; title: string; cards: { id: number; title: string; description?: string | undefined; }[]; },
+        board: { id: string; title: string; cards: {
+                id: string; author: string; title: string; description?: string; comments?: { id: string; author: string; content: string }[];
+            }[];
+        },
         cardTitle: string
     ) {
-        console.log('test');
         updateBoard(board, 'add card', cardTitle);
-
-        setNewCard((state) => ({
-            ...state,
-            [board.id]: false,
-        }));
+        toggleNewCard(board.id, false);
     }
 
-    function hideAddingCard(id: number) {
-        setNewCard((state) => ({
-            ...state,
-            [id]: false
-        }));
-    }
 
     function openCard(
-        board: { id: number; title: string; cards: { id: number; title: string; description?: string}[] },
-        card: { id: number; title: string; description?: string }
+        board: { id: string; title: string; cards: { id: string; author: string; title: string; description?: string;
+                comments?: { id: string; author: string; content: string }[];
+            }[]
+        },
+        card: { id: string; author: string; title: string; description?: string;
+            comments?: { id: string; author: string; content: string }[];
+        }
     ) {
         setCard(card);
         updateBoard(board);
-        // setBoard(board);
         setModalShow(true);
     }
 
     const updateCard = useCallback((board, card, key, value) => {
-        console.log(card, key, value);
-        // ???
         setCard((c) => ({
             ...c,
             [key]: value,
         }));
 
-        const cards =  board.cards.map((c: { id: number; title: string; description?: string}) => {
+        const cards =  board.cards.map((c: {
+            id: string; author: string; title: string; description?: string; comments?: { id: string; author: string; content: string }[];
+        }) => {
             if (c.id !== card.id) {
                 return {...c};
             }
@@ -88,20 +90,28 @@ const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
                            onChange={(e) => updateBoard(board, 'title', e.target.value)}/>
                 </div>
                 {board.cards.length > 0 && board.cards.map((card) => (
-                    <div className="card" onClick={() => openCard(board, card)}>{card.title}</div>
+                    <div className="card" onClick={() => openCard(board, card)}>
+                        <div className="card-title">{card.title}</div>
+                        {card.comments && card.comments.length > 0 && (
+                            <div className="card-comments">
+                                    <img className="icon" src="/images/message-square.svg" alt="comments" />
+                                {card.comments.length}
+                            </div>
+                        )}
+                    </div>
                 ))}
                 {!isNewCard?.[board.id] && (
-                    <div className="add-card" onClick={() => toggleNewCard(board.id)}>
+                    <div className="add-card" onClick={() => toggleNewCard(board.id, true)}>
                         <img src="/images/plus.svg" alt="add card" />
                         Добавить карточку
                     </div>
                 )}
                 {isNewCard?.[board.id] && (
                     <div className="new-card">
-                        <Form.Control as="textarea" rows={3} onChange={(e) => setCardTitle(e.target.value)}/>
+                        <Form.Control as="textarea" rows={2} onChange={(e) => setCardTitle(e.target.value)}/>
                         <div className="buttons">
-                            <Button onClick={() => addCard(board, cardTitle)}>Add card</Button>
-                            <div className="close-new-card" onClick={() => hideAddingCard(board.id)}>
+                            <Button onClick={() => addCard(board, cardTitle)}>Добавить карточку</Button>
+                            <div className="close-new-card" onClick={() => toggleNewCard(board.id, false)}>
                                 <img src="/images/x.svg" alt="close" />
                             </div>
                         </div>

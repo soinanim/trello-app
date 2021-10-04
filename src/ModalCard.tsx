@@ -1,87 +1,187 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import React, {Dispatch, SetStateAction, useState} from "react";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import { v4 as uuid } from 'uuid';
+
 
 export interface StandardComponentProps {
-    userName: string
-    modalShow: boolean
-    setModalShow: Dispatch<SetStateAction<boolean>>
-    card: { id: number; title: string; description?: string, comments?: {id: number, author: string, content: string}[] }
-    board: { id: number; title: string; cards: { id: number; title: string; description?: string, comments?: {id: number, author: string, content: string}[]}[] }
+    userName: string;
+    modalShow: boolean;
+    setModalShow: Dispatch<SetStateAction<boolean>>;
+    card: {
+        id: string; author: string; title: string; description?: string; comments?: {
+        id: string; author: string; content: string
+    }[];
+    };
+    board: { id: string; title: string; cards: {
+            id: string; title: string; description?: string; comments?: {
+                id: string; author: string; content: string
+            }[];
+        }[];
+    };
     // setBoard: Dispatch<SetStateAction<{ id: number; title: string; cards: { id: number; title: string; description?: string}[] }>>
-    updateCard: any
-    updateBoard: any
+    updateCard: any;
+    updateBoard: any;
 }
 
-function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow, card, board }: StandardComponentProps) {
-
+function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
+                       card, board }: StandardComponentProps) {
     const [isShowButtons, setShowButtons] = useState(false);
     const [isShowButton, setShowButton] = useState(false);
-    const [cardDescription, setCardDescription] = useState<string>('');
-    const [comment, setComment] = useState<{id: number, author: string, content: string}>({} as {id: number, author: string, content: string});
-    const [comments, setComments] = useState<{id: number, author: string, content: string}[]>([] as {id: number, author: string, content: string}[]);
+    const [cardDescription, setCardDescription] = useState<string>("");
+    const [comment, setComment] = useState<{
+        id: string;
+        author: string;
+        content: string;
+    } | undefined>({} as { id: string; author: string; content: string } | undefined);
+    const [isChanging, setChanging] = useState<{ [key: string]: boolean }>(
+        {} as { [key: number]: boolean }
+    );
 
-    // function addCardDescription(card: { id: number; title: string; description?: string }) {
-    //
-    //     card.description = cardDescription[card.id];
-    //     // localStorage.setItem('boards', )
-    // }
-    //
-    // function deleteCard(id: number) {
-    //     setBoard((board) => ({
-    //         ...board,
-    //         cards: board.cards.filter((c) => c.id !== card.id),
-    //     }))
-    // }
+    const addComment = (comments: { id: string; author: string; content: string; }[] | undefined, comment: { id: string; author: string; content: string; } | undefined ) => {
+        if(!comment) {
+            return;
+        }
+        const data = comments ? [...comments, comment] : [comment];
+        updateCard(board, card, "comments", data);
+        setShowButton(false);
+        setComment(undefined);
+    };
 
-    function addComment() {
-        console.log(board, card, comments);
-        setComments((comments) => [...comments, comment]);
+    function changeComment(comments: { id: string; author: string; content: string }[] | undefined ) {
+        if (!comments || !comment)  {
+            return;
+        }
 
-        updateCard(board, card, 'comments', comments);
-        setShowButtons(false);
+        const data = comments.map((c) => {
+            if (c.id === comment.id) {
+                return { ...comment };
+            } else {
+                return { ...c };
+            }
+        });
+
+        updateCard(board, card, "comments", data);
+        setChanging({ [comment.id]: false });
     }
 
+    const deleteComment = (comments: { id: string; author: string; content: string }[] | undefined, id: string) => {
+        const data = comments ? comments.filter((c) => c.id !== id) : undefined;
+        updateCard(board, card, "comments", data);
+        setModalShow(false)
+    };
 
     return (
-        <Modal card={card} board={board}
-               onHide={() => setModalShow(false)} show={modalShow}
-               size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+        <Modal card={card} board={board} onHide={() => setModalShow(false)} show={modalShow}
+               size="lg" aria-labelledby="contained-modal-title-vcenter" centered
+        >
             <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    <input key={card.id} type="text" name="board-title" defaultValue={card.title}
-                           onChange={(e) => updateCard(board, card, 'title', e.target.value)}/>
-                    <br/>в колонке {board.title} <br/>
-                    автор {userName}
-                </Modal.Title>
+                {/*<Modal.Title id="contained-modal-title-vcenter">*/}
+                {/*</Modal.Title>*/}
+                <div className="card-title">
+                    <img className="icon big" src="./images/credit-card.svg" alt="card" />
+                    <Form.Control as="textarea" rows={1} defaultValue={card.title}
+                                  onChange={(e) => updateCard(board, card, "title", e.target.value)}
+                    />
+                    {/*<input key={card.id} type="text" name="board-title" defaultValue={card.title}*/}
+                    {/*    onChange={(e) => updateCard(board, card, "title", e.target.value)}*/}
+                    {/*/>*/}
+                </div>
+                {/*<div className="buttons">*/}
+                {/*    <Button onClick={() => {*/}
+                {/*        const cards = board.cards.filter((c) => c.id !== card.id);*/}
+                {/*        updateBoard(board, "cards", cards);*/}
+                {/*    }}>Удалить</Button>*/}
+                {/*</div>*/}
             </Modal.Header>
             <Modal.Body>
-                Описание
-                <Form.Control as="textarea" rows={3} defaultValue={card.description} onFocus={() => setShowButtons(true)}
-                              onChange={(e) => setCardDescription(e.target.value)}
-                />
-                {isShowButtons && (
-                    <div className="buttons">
-                        <Button onClick={() => {
-                            updateCard(board, card, 'description', cardDescription);
-                            setShowButtons(false);
-                        }}>Save</Button>
-                        <div className="close-new-card">
-                            <img src="/images/x.svg" alt="close"/>
-                        </div>
+                <div className="card-about">
+                    в колонке {board.title} <br />
+                    автор {card.author}
+                </div>
+                <div className="card-description"
+                    onFocus={() => setShowButtons(true)}
+                    onBlur={() => setShowButtons(false)}
+                >
+                    <div className="subtitle">
+                        <img className="icon big" src="./images/align-left.svg" alt="actions" />
+                        Описание
                     </div>
-                )}
-                Комментарии
-                <Form.Control as="textarea" rows={3} onFocus={() => setShowButton(true)} onChange={(e) => setComments({
-                    id: card.comments ? card.comments.length + 1 : 1,
-                    author: userName,
-                    content: e.target.value,
-                })} />
-                {isShowButton && (
-                    <Button onClick={() => addComment()} >Save</Button>
-                )}
-                {/*<Button onClick={() => updateBoard(card.id)}>Delete</Button>*/}
+                    <Form.Control as="textarea" rows={2} defaultValue={card.description}
+                        onChange={(e) => setCardDescription(e.target.value)}
+                    />
+                    {isShowButtons && (
+                        <div className="buttons">
+                            <Button onClick={() => {
+                                console.log(cardDescription)
+                                        updateCard(board, card, "description", cardDescription);
+                                        setShowButtons(false);
+                            }}>Сохранить</Button>
+                            <div className="close-new-card">
+                                <img src="/images/x.svg" alt="close" />
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="card-actions" onFocus={() => setShowButton(true)}>
+                    <div className="subtitle">
+                        <img className="icon big" src="./images/list.svg" alt="actions" />
+                        Действия
+                    </div>
+                    <Form.Control key={comment && comment.id} as="textarea" rows={1} placeholder="Напишите комментарий"
+                        onChange={(e) => setComment({
+                                id: uuid(),
+                                author: userName,
+                                content: e.target.value
+                            })
+                        }
+                    />
+                    {isShowButton && (
+                        <div className="buttons">
+                            <Button onClick={() => addComment(card.comments, comment)}>Сохранить</Button>
+                        </div>
+                    )}
+                </div>
+                <div className="card-comments">
+                    {card.comments && card.comments.map((comment) => (
+                        <div key={comment.id} className="card-comment">
+                            <img src="./images/user.svg" alt="user" />
+                            <span>{comment.author}</span>
+                            <div className="comment-container">
+                                <div className="comment-content">
+                                    {isChanging[comment.id] ? (
+                                        <div>
+                                            <Form.Control as="textarea" rows={1} defaultValue={comment.content}
+                                                  onChange={(e) => setComment({
+                                                        id: comment.id,
+                                                        author: comment.author,
+                                                        content: e.target.value
+                                                  })}
+                                            />
+                                            <div className="buttons">
+                                                <Button onClick={() => changeComment(card.comments)}>Сохранить</Button>
+                                                <div onClick={() => setChanging({ [comment.id]: false })} className="close-new-card">
+                                                    <img src="/images/x.svg" alt="close" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        comment.content
+                                    )}
+                                </div>
+                                <div className="comment-reaction">
+                                    <span onClick={() => setChanging({ [comment.id]: true })}>
+                                      Изменить
+                                    </span>
+                                    <span onClick={() => deleteComment(card.comments, comment.id)}>
+                                        - Удалить
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </Modal.Body>
         </Modal>
     );

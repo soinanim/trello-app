@@ -2,12 +2,12 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    color: #172b4d;
 }
 
 .app {
     width: 100vw;
     height: 100vh;
-    color: #172b4d;
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif;
     font-size: 14px;
     font-weight: 400;
@@ -15,28 +15,24 @@
 }
 
 .boards {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: start;
 }
 
 .board {
-    min-width: 300px;
-    min-height: 200px;
-    /* border: 1px solid lightgray; */
     background-color: #ebecf0;
     padding: 20px 10px;
-    border-radius: 12px;
+    border-radius: 8px;
     margin: 15px 10px;
     display: flex;
-    align-items: center;
-    text-align: left;
     flex-direction: column;
 }
 
 .board-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    padding: 4px 8px;
 }
 
 .board-title input {
@@ -57,9 +53,46 @@
     /*background-color: #fcfcf9;*/
 }
 
+.card:hover {
+    background-color: #f4f5f7;
+}
+
+.card-title {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.card-title textarea {
+    border: none;
+}
+
+.card-about {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.card-description, .card-actions{
+    margin-bottom: 20px;
+}
+
+.icon {
+    max-width: 17px;
+    max-height: 17px;
+    margin-right: 4px;
+}
+
+.icon.big {
+    max-width: 20px;
+    max-height: 20px;
+}
+
 .add-card {
     display: flex;
     align-items: center;
+    padding: 2px;
+    /* margin: 15px 3px; */
     margin-top: 15px;
     cursor: pointer;
 }

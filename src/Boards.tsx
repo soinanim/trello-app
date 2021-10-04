@@ -1,24 +1,24 @@
 import React, {useState, useEffect, useCallback} from 'react';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ModalWelcome from "./ModalWelcome";
 import Board from "./Board";
+import { v4 as uuid } from 'uuid';
 
 const Boards = () => {
 
     const [boards, setBoards] = useState<{
-        id: number;
+        id: string;
         title: string;
-        cards: { id: number, title: string, description?: string,
-            comments?: {id: number, author: string, content: string}[]
+        cards: { id: string, title: string, author: string, description?: string,
+            comments?: {id: string, author: string, content: string}[]
         }[];
     }[]>(JSON.parse(localStorage.getItem('boards') as string) || [
-        {id: 1, title: "TODO", cards: []},
-        { id: 2, title: "In Progress", cards: [] },
-        { id: 3, title: "Testing", cards: [] },
-        { id: 4, title: "Done", cards: [] },
+        {id: uuid(), title: "TODO", cards: []},
+        { id: uuid(), title: "In Progress", cards: [] },
+        { id: uuid(), title: "Testing", cards: [] },
+        { id: uuid(), title: "Done", cards: [] },
     ]);
-    const [userName, setUserName] = useState<string>('');
+    const [userName, setUserName] = useState<string>(localStorage.getItem('userName') as string || '');
 
     const updateBoard = useCallback((board, key: string, value) => {
         // for board title:
@@ -38,7 +38,7 @@ const Boards = () => {
                 data = boards.map((b) => (b.id === board.id)
                     ? ({
                         ...b,
-                        cards: [...b.cards, { id: b.cards.length + 1, title: value, description: '' }],
+                        cards: [...b.cards, { id: uuid(), title: value, author:  userName }],
                     })
                     : {...b}
                 );
@@ -54,24 +54,17 @@ const Boards = () => {
             localStorage.setItem('boards', JSON.stringify(data));
             return data;
             });
-    },[]);
+    },[userName]);
 
     const updateUserName = useCallback((value) => {
         setUserName(value);
     }, []);
-
-
 
     useEffect(() => {
         // localStorage.clear();
         localStorage.setItem('boards', JSON.stringify(boards));
     }, [boards]);
 
-    // useEffect(() => {
-    //     setBoards(() => {
-    //         return [...boards, {...board}]
-    //     })
-    // }, [boards, board]);
 
 
     return (
