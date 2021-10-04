@@ -69,18 +69,18 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
     const deleteComment = (comments: { id: string; author: string; content: string }[] | undefined, id: string) => {
         const data = comments ? comments.filter((c) => c.id !== id) : undefined;
         updateCard(board, card, "comments", data);
-        setModalShow(false)
     };
 
     return (
         <Modal card={card} board={board} onHide={() => setModalShow(false)} show={modalShow}
                size="lg" aria-labelledby="contained-modal-title-vcenter" centered
         >
+            <div className="window">
             <Modal.Header closeButton>
                 {/*<Modal.Title id="contained-modal-title-vcenter">*/}
                 {/*</Modal.Title>*/}
                 <div className="card-title">
-                    <img className="icon big" src="./images/credit-card.svg" alt="card" />
+                    <img className="icon middle" src="./images/credit-card.svg" alt="card" />
                     <Form.Control as="textarea" rows={1} defaultValue={card.title}
                                   onChange={(e) => updateCard(board, card, "title", e.target.value)}
                     />
@@ -98,14 +98,14 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
             <Modal.Body>
                 <div className="card-about">
                     в колонке {board.title} <br />
-                    автор {card.author}
+                    автор карточки {card.author}
                 </div>
-                <div className="card-description"
+                <div className="card-actions"
                     onFocus={() => setShowButtons(true)}
                     onBlur={() => setShowButtons(false)}
                 >
                     <div className="subtitle">
-                        <img className="icon big" src="./images/align-left.svg" alt="actions" />
+                        <img className="icon middle" src="./images/align-left.svg" alt="actions" />
                         Описание
                     </div>
                     <Form.Control as="textarea" rows={2} defaultValue={card.description}
@@ -114,7 +114,6 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
                     {isShowButtons && (
                         <div className="buttons">
                             <Button onClick={() => {
-                                console.log(cardDescription)
                                         updateCard(board, card, "description", cardDescription);
                                         setShowButtons(false);
                             }}>Сохранить</Button>
@@ -126,15 +125,15 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
                 </div>
                 <div className="card-actions" onFocus={() => setShowButton(true)}>
                     <div className="subtitle">
-                        <img className="icon big" src="./images/list.svg" alt="actions" />
+                        <img className="icon middle" src="./images/list.svg" alt="actions" />
                         Действия
                     </div>
-                    <Form.Control key={comment && comment.id} as="textarea" rows={1} placeholder="Напишите комментарий"
+                    <Form.Control  as="textarea" rows={1} placeholder="Напишите комментарий"
                         onChange={(e) => setComment({
-                                id: uuid(),
-                                author: userName,
-                                content: e.target.value
-                            })
+                            id: uuid(),
+                            author: userName,
+                            content: e.target.value
+                        })
                         }
                     />
                     {isShowButton && (
@@ -143,12 +142,13 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
                         </div>
                     )}
                 </div>
-                <div className="card-comments">
+                <div className="card-actions">
+                    {card.comments && card.comments?.length > 0 && <div className="subtitle">Комментарии</div>}
                     {card.comments && card.comments.map((comment) => (
                         <div key={comment.id} className="card-comment">
-                            <img src="./images/user.svg" alt="user" />
-                            <span>{comment.author}</span>
+                            <img className="icon big" src="./images/user.svg" alt="user" />
                             <div className="comment-container">
+                                <span>{comment.author}</span>
                                 <div className="comment-content">
                                     {isChanging[comment.id] ? (
                                         <div>
@@ -162,7 +162,7 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
                                             <div className="buttons">
                                                 <Button onClick={() => changeComment(card.comments)}>Сохранить</Button>
                                                 <div onClick={() => setChanging({ [comment.id]: false })} className="close-new-card">
-                                                    <img src="/images/x.svg" alt="close" />
+                                                    <img  src="/images/x.svg" alt="close" />
                                                 </div>
                                             </div>
                                         </div>
@@ -183,6 +183,7 @@ function ModalCard({userName, modalShow, updateCard, updateBoard, setModalShow,
                     ))}
                 </div>
             </Modal.Body>
+            </div>
         </Modal>
     );
 }

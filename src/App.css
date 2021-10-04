@@ -40,6 +40,10 @@
     background-color: transparent;
 }
 
+.window {
+    background-color: #f4f5f7;
+}
+
 .card {
     width: 100%;
     /*border-bottom: 1px solid gray;*/
@@ -73,8 +77,21 @@
     margin-bottom: 20px;
 }
 
-.card-description, .card-actions{
+.card-actions{
     margin-bottom: 20px;
+}
+
+.card-actions .subtitle {
+    margin-bottom: 10px;
+}
+
+.card-actions textarea {
+    background-color: #091e420a;
+}
+
+.card-comment {
+    display: flex;
+    align-items: flex-start;
 }
 
 .icon {
@@ -83,9 +100,16 @@
     margin-right: 4px;
 }
 
-.icon.big {
+.icon.middle {
     max-width: 20px;
     max-height: 20px;
+}
+
+.icon.big {
+    max-width: 30px;
+    max-height: 30px;
+    margin-right: 10px;
+
 }
 
 .add-card {
