@@ -1,10 +1,8 @@
 import React from 'react';
-import './App.css';
-import Boards from "./Boards";
+import './styles/App.css';
+import Boards from "./Boards/Boards";
 
 const App = () => {
-
-    //---
 
     return (
         <div className="app">

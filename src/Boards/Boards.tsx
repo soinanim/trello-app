@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ModalWelcome from "./ModalWelcome";
+import ModalWelcome from "../Modals/ModalWelcome";
 import Board from "./Board";
 import { v4 as uuid } from 'uuid';
 
 const Boards = () => {
 
+    const [userName, setUserName] = useState<string>(localStorage.getItem('userName') as string || '');
     const [boards, setBoards] = useState<{
         id: string;
         title: string;
@@ -18,22 +19,11 @@ const Boards = () => {
         { id: uuid(), title: "Testing", cards: [] },
         { id: uuid(), title: "Done", cards: [] },
     ]);
-    const [userName, setUserName] = useState<string>(localStorage.getItem('userName') as string || '');
 
     const updateBoard = useCallback((board, key: string, value) => {
-        // for board title:
-        // setBoard((b) => {
-        //     console.log(b);
-        //     if (b.id !== board.id) {
-        //         return;
-        //     }
-        //     return ({
-        //         ...board,
-        //         [key]: value,
-        //     })
-        // })
         setBoards((boards) => {
             let data;
+
             if (key === 'add card') {
                 data = boards.map((b) => (b.id === board.id)
                     ? ({
@@ -51,9 +41,10 @@ const Boards = () => {
                     : {...b}
                 );
             }
+
             localStorage.setItem('boards', JSON.stringify(data));
             return data;
-            });
+        });
     },[userName]);
 
     const updateUserName = useCallback((value) => {
@@ -61,11 +52,10 @@ const Boards = () => {
     }, []);
 
     useEffect(() => {
-        // localStorage.clear();
         localStorage.setItem('boards', JSON.stringify(boards));
     }, [boards]);
 
-
+    // ---
 
     return (
         <>

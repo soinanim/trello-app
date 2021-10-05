@@ -1,10 +1,10 @@
 import React, {useCallback, useState} from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import ModalCard from "./ModalCard";
+import ModalCard from "../Modals/ModalCard";
 
 export interface StandardComponentProps {
-    userName: string // TODO delete it
+    userName: string
     board: { id: string; title: string;
         cards: { id: string; author: string; title: string; description?: string;
             comments?: { id: string; author: string; content: string }[];
@@ -19,9 +19,11 @@ const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
     const [isNewCard, setNewCard] = useState<{[key: string]: boolean}>();
     const [cardTitle, setCardTitle] = useState("");
     const [modalShow, setModalShow] = React.useState<boolean>(false);
-    const [card, setCard] = React.useState<{ id: string; author: string; title: string; description?: string;
-        comments?: { id: string; author: string; content: string }[]; }>(
-        {} as { id: string; author: string; title: string; description?: string;
+    const [card, setCard] = React.useState<{
+        id: string; author: string; title: string; description?: string;
+        comments?: { id: string; author: string; content: string }[];
+        }>(
+            {} as { id: string; author: string; title: string; description?: string;
             comments?: { id: string; author: string; content: string }[]; }
     );
 
@@ -33,8 +35,9 @@ const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
     }
 
     function addCard(
-        board: { id: string; title: string; cards: {
-                id: string; author: string; title: string; description?: string; comments?: { id: string; author: string; content: string }[];
+        board: { id: string; title: string;
+            cards: { id: string; author: string; title: string; description?: string;
+                comments?: { id: string; author: string; content: string }[];
             }[];
         },
         cardTitle: string
@@ -74,10 +77,12 @@ const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
                 ...card,
                 [key]: value,
             })
-        })
+        });
+
         updateBoard(board, 'cards', cards);
     },[updateBoard]);
 
+    // --
 
     return (
         <>

@@ -12,7 +12,7 @@ export interface StandardComponentProps {
 function ModalWelcome( {userName, updateUserName}: StandardComponentProps ) {
 
     const [modalShow, setModalShow] = React.useState(true);
-    const [nameError, setNameError] = useState(''); // error text : Please enter your name.
+    const [nameError, setNameError] = useState('');
 
     function saveUserName(event: { currentTarget: any; preventDefault: () => void; stopPropagation: () => void; }) {
         event.preventDefault();
@@ -39,11 +39,11 @@ function ModalWelcome( {userName, updateUserName}: StandardComponentProps ) {
     //--
 
     return (
-        <Modal show={modalShow}
-            size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={modalShow} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Welcome to Trello!
+                    <img className="icon big" src="./images/trello.svg" />
+                    Trello!
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
