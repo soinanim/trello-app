@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import { v4 as uuid } from "uuid";
 
 export interface StandardComponentProps {
-    userName: string;
+    username: string;
     modalShow: boolean;
     setModalShow: Dispatch<SetStateAction<boolean>>;
     card: { id: string; author: string; title: string; description?: string;
@@ -20,7 +20,7 @@ export interface StandardComponentProps {
     updateBoard: any;
 }
 
-function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow, card, board }: StandardComponentProps) {
+function ModalCard({ username, modalShow, updateCard, updateBoard, setModalShow, card, board }: StandardComponentProps) {
     const [isShowButtons, setShowButtons] = useState(false);
     const [isShowButton, setShowButton] = useState(false);
     const [cardDescription, setCardDescription] = useState<string>("");
@@ -28,6 +28,9 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
         {} as { [key: number]: boolean }
     );
     const [comment, setComment] = useState<{ id: string; author: string; content: string; } | undefined>(
+        {} as { id: string; author: string; content: string } | undefined
+    );
+    const [newComment, setNewComment] = useState<{ id: string; author: string; content: string; } | undefined>(
         {} as { id: string; author: string; content: string } | undefined
     );
 
@@ -49,21 +52,25 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
         setComment(undefined);
     };
 
-    function changeComment(comments: { id: string; author: string; content: string }[] | undefined) {
-        if (!comments || !comment) {
+    const changeComment = (
+        comments: { id: string; author: string; content: string }[] | undefined,
+        newComment: { id: string; author: string; content: string } | undefined
+    ) => {
+
+        if (!comments || !newComment) {
             return;
         }
 
         const data = comments.map((c) => {
-            if (c.id === comment.id) {
-                return { ...comment };
+            if (c.id === newComment.id) {
+                return { ...newComment };
             } else {
                 return { ...c };
             }
         });
 
         updateCard(board, card, "comments", data);
-        setChanging({ [comment.id]: false });
+        setChanging({ [newComment.id]: false });
     }
 
     const deleteComment = (
@@ -73,6 +80,12 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
         const data = comments ? comments.filter((c) => c.id !== id) : undefined;
         updateCard(board, card, "comments", data);
     };
+
+    function deleteCard() {
+        const cards = board.cards.filter((c) => c.id !== card.id);
+        updateBoard(board, "cards", cards);
+        setModalShow(false);
+    }
 
     function handleClickOutside(event: { target: any; }) {
         if (refDescription.current && !refDescription.current.contains(event.target as Node)) {
@@ -94,7 +107,7 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
     // ---
 
     return (
-        <Modal card={card} board={board} onHide={() => setModalShow(false)} show={modalShow}
+        <Modal onHide={() => setModalShow(false)} show={modalShow}
             size="lg" aria-labelledby="contained-modal-title-vcenter" centered
         >
             <div className="window">
@@ -107,11 +120,7 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
                             />
                         </div>
                         <div className="buttons">
-                            <Button variant="outline-secondary" onClick={() => {
-                                const cards = board.cards.filter((c) => c.id !== card.id);
-                                updateBoard(board, "cards", cards);
-                                setModalShow(false);
-                            }}>Удалить карточку</Button>
+                            <Button variant="outline-secondary" onClick={deleteCard}>Удалить карточку</Button>
                         </div>
                     </div>
                 </Modal.Header>
@@ -126,8 +135,9 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
                             Описание
                         </div>
                         <div ref={refDescription}>
-                            <Form.Control as="textarea" rows={3} defaultValue={card.description}
-                                onChange={(e) => setCardDescription(e.target.value)}
+                            <Form.Control as="textarea" rows={4} defaultValue={card.description}
+                                          placeholder="Добавить более подробное описание..."
+                                          onChange={(e) => setCardDescription(e.target.value)}
                             />
                             {isShowButtons && (
                                 <div className="buttons">
@@ -136,7 +146,7 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
                                             setShowButtons(false);
                                         }}
                                     >Сохранить</Button>
-                                    <div className="close-new-card">
+                                    <div className="close-new-card" onClick={() => setShowButtons(false)}>
                                         <img src="/images/x.svg" alt="close" />
                                     </div>
                                 </div>
@@ -150,7 +160,7 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
                         </div>
                         <div ref={refComment}>
                             <Form.Control as="textarea" rows={1} placeholder="Напишите комментарий" value={comment?.content || ''}
-                                onChange={(e) => setComment({id: uuid(), author: userName, content: e.target.value})}
+                                onChange={(e) => setComment({id: uuid(), author: username, content: e.target.value})}
                             />
                             {isShowButton && (
                                 <div className="buttons">
@@ -175,10 +185,10 @@ function ModalCard({ userName, modalShow, updateCard, updateBoard, setModalShow,
                                         {isChanging[comment.id] ? (
                                             <div>
                                                 <Form.Control as="textarea" rows={1} defaultValue={comment.content}
-                                                    onChange={(e) => setComment({id: comment.id, author: comment.author, content: e.target.value})}
+                                                    onChange={(e) => setNewComment({id: comment.id, author: comment.author, content: e.target.value})}
                                                 />
                                                 <div className="buttons">
-                                                    <Button onClick={() => changeComment(card.comments)}>
+                                                    <Button onClick={() => changeComment(card.comments, newComment)}>
                                                         Сохранить
                                                     </Button>
                                                     <div className="close-new-card" onClick={() => setChanging({ [comment.id]: false })}>

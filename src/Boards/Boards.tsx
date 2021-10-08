@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 
 const Boards = () => {
 
-    const [userName, setUserName] = useState<string>(localStorage.getItem('userName') as string || '');
+    const [username, setUsername] = useState<string>(localStorage.getItem('username') as string || '');
     const [boards, setBoards] = useState<{
         id: string;
         title: string;
@@ -28,7 +28,7 @@ const Boards = () => {
                 data = boards.map((b) => (b.id === board.id)
                     ? ({
                         ...b,
-                        cards: [...b.cards, { id: uuid(), title: value, author:  userName }],
+                        cards: [...b.cards, { id: uuid(), title: value, author:  username }],
                     })
                     : {...b}
                 );
@@ -45,10 +45,10 @@ const Boards = () => {
             localStorage.setItem('boards', JSON.stringify(data));
             return data;
         });
-    },[userName]);
+    },[username]);
 
-    const updateUserName = useCallback((value) => {
-        setUserName(value);
+    const updateUsername = useCallback((value) => {
+        setUsername(value);
     }, []);
 
     useEffect(() => {
@@ -59,10 +59,10 @@ const Boards = () => {
 
     return (
         <>
-            <ModalWelcome userName={userName} updateUserName={updateUserName} />
+            <ModalWelcome username={username} updateUsername={updateUsername} />
             <div className="boards">
                 {boards.map((board) => (
-                    <Board userName={userName} board={board} updateBoard={updateBoard} />
+                    <Board username={username} board={board} updateBoard={updateBoard} />
                 ))}
             </div>
         </>

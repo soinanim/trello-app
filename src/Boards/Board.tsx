@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import ModalCard from "../Modals/ModalCard";
 
 export interface StandardComponentProps {
-    userName: string
+    username: string
     board: { id: string; title: string;
         cards: { id: string; author: string; title: string; description?: string;
             comments?: { id: string; author: string; content: string }[];
@@ -14,7 +14,7 @@ export interface StandardComponentProps {
 }
 
 
-const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
+const Board = ( {username, board, updateBoard}: StandardComponentProps ) => {
 
     const [isNewCard, setNewCard] = useState<{[key: string]: boolean}>();
     const [cardTitle, setCardTitle] = useState("");
@@ -86,7 +86,7 @@ const Board = ( {userName, board, updateBoard}: StandardComponentProps ) => {
 
     return (
         <>
-            <ModalCard userName={userName} card={card} board={board} updateCard={updateCard}
+            <ModalCard username={username} card={card} board={board} updateCard={updateCard}
                        updateBoard={updateBoard} modalShow={modalShow} setModalShow={setModalShow}
             />
             <div className="board">
