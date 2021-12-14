@@ -4,6 +4,10 @@ import ModalWelcome from "../Modals/ModalWelcome";
 import Board from "./Board";
 import { v4 as uuid } from "uuid";
 
+// interface  updateBoardProps {
+  // board
+// }
+
 const Boards = () => {
   const [username, setUsername] = useState<string>(
     (localStorage.getItem("username") as string) || ""
